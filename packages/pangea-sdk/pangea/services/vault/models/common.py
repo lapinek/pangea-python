@@ -254,7 +254,7 @@ class ListItemData(ItemData):
 class ListResult(PangeaResponseResult):
     items: List[ListItemData] = []
     count: int
-    last: Optional[str]
+    last: Optional[str] = None
 
 
 class ListRequest(APIRequestModel):
