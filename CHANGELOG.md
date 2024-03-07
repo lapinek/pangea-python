@@ -31,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - An unused binascii import.
 - Unused os imports.
-
+- `utils.dict_order_keys()` and `utils.dict_order_keys_recursive()`.
 
 ## [3.7.0] - 2024-02-26
 
