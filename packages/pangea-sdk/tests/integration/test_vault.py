@@ -113,14 +113,13 @@ class TestVault(unittest.TestCase):
         decrypt1_deactivated_resp = self.vault.decrypt(id, cipher_v1, 1)
         self.assertEqual(data_b64, decrypt1_deactivated_resp.result.plain_text)
 
-    def encrypting_cycle_fpe(self, id: str):
+    def encrypting_cycle_fpe(self, id: str) -> None:
         msg = "thisisamessagetoencrypt"
-        data_b64 = str2str_b64(msg)
         tweak = str2str_b64("abcdefg")
 
         # Encrypt 1
         encrypt1_resp = self.vault.encrypt_transform(
-            id=id, plain_text=data_b64, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC
+            id=id, plain_text=msg, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC
         )
 
         self.assertEqual(id, encrypt1_resp.result.id)
@@ -135,7 +134,7 @@ class TestVault(unittest.TestCase):
 
         # Encrypt 2
         encrypt2_resp = self.vault.encrypt_transform(
-            id=id, plain_text=data_b64, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC
+            id=id, plain_text=msg, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC
         )
         self.assertEqual(id, encrypt2_resp.result.id)
         self.assertEqual(2, encrypt2_resp.result.version)
@@ -146,13 +145,13 @@ class TestVault(unittest.TestCase):
         decrypt1_resp = self.vault.decrypt_transform(
             id=id, cipher_text=cipher_v1, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC, version=1
         )
-        self.assertEqual(data_b64, decrypt1_resp.result.plain_text)
+        self.assertEqual(msg, decrypt1_resp.result.plain_text)
 
         # Decrypt 2
         decrypt2_resp = self.vault.decrypt_transform(
             id=id, cipher_text=cipher_v2, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC, version=2
         )
-        self.assertTrue(data_b64, decrypt2_resp.result.plain_text)
+        self.assertTrue(msg, decrypt2_resp.result.plain_text)
 
         # Update
         update_resp = self.vault.update(id, folder="updated")
@@ -162,7 +161,7 @@ class TestVault(unittest.TestCase):
         decrypt_default_resp = self.vault.decrypt_transform(
             id=id, cipher_text=cipher_v2, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC
         )
-        self.assertEqual(data_b64, decrypt_default_resp.result.plain_text)
+        self.assertEqual(msg, decrypt_default_resp.result.plain_text)
 
         # Deactivate key
         change_state_resp = self.vault.state_change(id, ItemVersionState.DEACTIVATED, version=1)
@@ -172,7 +171,7 @@ class TestVault(unittest.TestCase):
         decrypt1_deactivated_resp = self.vault.decrypt_transform(
             id=id, cipher_text=cipher_v1, tweak=tweak, alphabet=TransformAlphabet.ALPHANUMERIC, version=1
         )
-        self.assertEqual(data_b64, decrypt1_deactivated_resp.result.plain_text)
+        self.assertEqual(msg, decrypt1_deactivated_resp.result.plain_text)
 
     def signing_cycle(self, id: str):
         msg = "thisisamessagetosign"
@@ -606,7 +605,7 @@ class TestVault(unittest.TestCase):
                 self.vault.delete(id=id)
                 self.fail()
 
-    def test_sym_fpe_encrypting_life_cycle(self):
+    def test_sym_fpe_encrypting_life_cycle(self) -> None:
         algorithms = [
             SymmetricAlgorithm.AES128_FF3_1_BETA,
             SymmetricAlgorithm.AES256_FF3_1_BETA,

@@ -23,6 +23,7 @@ class KeyPurpose(str, enum.Enum):
     ENCRYPTION = "encryption"
     JWT = "jwt"
     FPE = "fpe"
+    """Format-preserving encryption."""
 
     def __str__(self):
         return str(self.value)
@@ -85,8 +86,11 @@ class SymmetricAlgorithm(str, enum.Enum):
     AES128_CBC = "AES-CBC-128"
     AES256_CBC = "AES-CBC-256"
     AES = "AES-CFB-128"  # deprecated, use AES128_CFB instead
-    AES128_FF3_1_BETA = ("AES-FF3-1-128-BETA",)
-    AES256_FF3_1_BETA = ("AES-FF3-1-256-BETA",)
+    AES128_FF3_1_BETA = "AES-FF3-1-128-BETA"
+    """128-bit encryption using the FF3-1 algorithm."""
+
+    AES256_FF3_1_BETA = "AES-FF3-1-256-BETA"
+    """256-bit encryption using the FF3-1 algorithm."""
 
     def __str__(self):
         return str(self.value)
@@ -97,7 +101,6 @@ class SymmetricAlgorithm(str, enum.Enum):
 
 Metadata = NewType("Metadata", Dict[str, str])
 Tags = NewType("Tags", List[str])
-Base64str = NewType("Base64str", str)
 
 
 class ItemOrder(str, enum.Enum):
@@ -435,76 +438,87 @@ class EncryptStructuredResult(PangeaResponseResult, Generic[TDict]):
 
 class TransformAlphabet(str, enum.Enum):
     NUMERIC = "numeric"
-    ALPHA_LOWER = "alphalower"
-    ALPHA_UPPER = "alphaupper"
-    ALPHANUMERIC_LOWER = "alphanumericlower"
-    ALPHANUMERIC_UPPER = "alphanumericupper"
-    ALPHANUMERIC = "alphanumeric"
+    """Numeric (0-9)."""
 
-    def __str__(self):
+    ALPHA_LOWER = "alphalower"
+    """Lowercase alphabet (a-z)."""
+
+    ALPHA_UPPER = "alphaupper"
+    """Uppercase alphabet (A-Z)."""
+
+    ALPHANUMERIC_LOWER = "alphanumericlower"
+    """Lowercase alphabet with numbers (a-z, 0-9)."""
+
+    ALPHANUMERIC_UPPER = "alphanumericupper"
+    """Uppercase alphabet with numbers (A-Z, 0-9)."""
+
+    ALPHANUMERIC = "alphanumeric"
+    """Alphanumeric (a-z, A-Z, 0-9)."""
+
+    def __str__(self) -> str:
         return str(self.value)
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return str(self.value)
 
 
 class EncryptTransformRequest(APIRequestModel):
     id: str
-    """The item ID"""
+    """The item ID."""
 
     plain_text: str
-    """A message to be encrypted"""
+    """A message to be encrypted."""
 
-    tweak: Base64str
-    """User provided tweak, which must be a base64-encoded 7-digit string. The user must securely store the tweak source which will be needed to decrypt the data."""
+    tweak: str
+    """User-provided tweak, which must be a base64-encoded 7-digit string."""
 
     alphabet: TransformAlphabet
     """Set of characters to use for format-preserving encryption (FPE)."""
 
     version: Optional[int] = None
-    """The item version"""
+    """The item version."""
 
 
 class EncryptTransformResult(PangeaResponseResult):
     id: str
-    """The item ID"""
+    """The item ID."""
 
     cipher_text: str
-    """The encrypted message"""
+    """The encrypted message."""
 
     version: int
-    """The item version"""
+    """The item version."""
 
     algorithm: str
-    """The algorithm of the key"""
+    """The algorithm of the key."""
 
 
 class DecryptTransformRequest(APIRequestModel):
     id: str
-    """The item ID"""
+    """The item ID."""
 
     cipher_text: str
-    """A message encrypted by Vault"""
+    """A message encrypted by Vault."""
 
-    tweak: Base64str
-    """User provided tweak, which must be a base64-encoded 7-digit string. The user must securely store the tweak source which will be needed to decrypt the data."""
+    tweak: str
+    """User-provided tweak, which must be a base64-encoded 7-digit string."""
 
     alphabet: TransformAlphabet
     """Set of characters to use for format-preserving encryption (FPE)."""
 
     version: Optional[int] = None
-    """The item version"""
+    """The item version."""
 
 
 class DecryptTransformResult(PangeaResponseResult):
     id: str
-    """The item ID"""
+    """The item ID."""
 
     version: int
-    """The item version"""
+    """The item version."""
 
     algorithm: str
-    """The algorithm of the key"""
+    """The algorithm of the key."""
 
     plain_text: str
-    """Decrypted message"""
+    """Decrypted message."""

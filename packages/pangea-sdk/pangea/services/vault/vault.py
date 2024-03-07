@@ -17,7 +17,6 @@ from pangea.services.vault.models.asymmetric import (
 )
 from pangea.services.vault.models.common import (
     AsymmetricAlgorithm,
-    Base64str,
     DecryptTransformRequest,
     DecryptTransformResult,
     DeleteRequest,
@@ -1305,21 +1304,21 @@ class Vault(ServiceBase):
         self,
         id: str,
         plain_text: str,
-        tweak: Base64str,
+        tweak: str,
         alphabet: TransformAlphabet,
         version: Optional[int] = None,
     ) -> PangeaResponse[EncryptTransformResult]:
         """
         Encrypt transform
 
-        Encrypt using a format preserving algorithm (FPE).
+        Encrypt using a format-preserving algorithm (FPE).
 
         OperationId: vault_post_v1_key_encrypt_transform
 
         Args:
             id (str): The item ID.
             plain_text (str): A message to be encrypted.
-            tweak (Base64str): User provided tweak, which must be a base64-encoded 7-digit string. The user must securely store the tweak source which will be needed to decrypt the data.
+            tweak (str): User provided tweak, which must be a base64-encoded 7-digit string.
             alphabet (TransformAlphabet): Set of characters to use for format-preserving encryption (FPE).
             version (int, optional): The item version. Defaults to the current version.
 
@@ -1327,12 +1326,15 @@ class Vault(ServiceBase):
             PangeaAPIException: If an API error happens.
 
         Returns:
-            A `PangeaResponse` where the decrypted object is returned in the
-            `response.result` field. Available response fields can be found in
-            our [API documentation](https://pangea.cloud/docs/api/vault#decrypt-transform).
+            A `PangeaResponse` containing the encrypted message.
 
         Examples:
-            TODO:
+            vault.encrypt_transform(
+                id="pvi_[...]",
+                plain_text="message to encrypt",
+                tweak="MTIzMTIzMT==",
+                alphabet=TransformAlphabet.ALPHANUMERIC,
+            )
         """
 
         input = EncryptTransformRequest(
@@ -1349,19 +1351,19 @@ class Vault(ServiceBase):
         )
 
     def decrypt_transform(
-        self, id: str, cipher_text: str, tweak: Base64str, alphabet: TransformAlphabet, version: Optional[int] = None
+        self, id: str, cipher_text: str, tweak: str, alphabet: TransformAlphabet, version: Optional[int] = None
     ) -> PangeaResponse[DecryptTransformResult]:
         """
         Decrypt transform
 
-        Decrypt using a format preserving algorithm (FPE).
+        Decrypt using a format-preserving algorithm (FPE).
 
         OperationId: vault_post_v1_key_decrypt_transform
 
         Args:
             id (str): The item ID.
             cipher_text (str): A message encrypted by Vault.
-            tweak (Base64str): User provided tweak, which must be a base64-encoded 7-digit string. The user must securely store the tweak source which will be needed to decrypt the data.
+            tweak (str): User provided tweak, which must be a base64-encoded 7-digit string.
             alphabet (TransformAlphabet): Set of characters to use for format-preserving encryption (FPE).
             version (int, optional): The item version. Defaults to the current version.
 
@@ -1369,12 +1371,15 @@ class Vault(ServiceBase):
             PangeaAPIException: If an API error happens.
 
         Returns:
-            A `PangeaResponse` where the decrypted object is returned in the
-            `response.result` field. Available response fields can be found in
-            our [API documentation](https://pangea.cloud/docs/api/vault#decrypt-transform).
+            A `PangeaResponse` containing the decrypted message.
 
         Examples:
-            TODO:
+            vault.decrypt_transform(
+                id="pvi_[...]",
+                cipher_text="encrypted message",
+                tweak="MTIzMTIzMT==",
+                alphabet=TransformAlphabet.ALPHANUMERIC,
+            )
         """
 
         input = DecryptTransformRequest(id=id, cipher_text=cipher_text, tweak=tweak, alphabet=alphabet, version=version)
